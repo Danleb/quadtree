@@ -29,6 +29,8 @@ public:
 
     size_t size() const;
 
+    void reserve(size_t capacity);
+
     size_t range() const;
 
     T& operator[](uint32_t index);
@@ -103,6 +105,12 @@ template<typename T>
 size_t FreeList<T>::size() const
 {
     return m_size;
+}
+
+template<typename T>
+void FreeList<T>::reserve(size_t capacity)
+{
+    m_data.reserve(capacity);
 }
 
 template<typename T>

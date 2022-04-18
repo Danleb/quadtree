@@ -1,4 +1,4 @@
-﻿#include <quadtree/FastArray.h>
+﻿#include <light/FastArray.h>
 
 #include <gtest/gtest.h>
 
