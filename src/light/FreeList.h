@@ -97,6 +97,7 @@ void FreeList<T>::erase(uint32_t index)
 template<typename T>
 void FreeList<T>::clear()
 {
+    m_size = 0;
     m_data.clear();
     m_firstFree = NIL;
 }

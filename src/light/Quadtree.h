@@ -78,12 +78,14 @@ public:
 
     void reserve(size_t capacity);
 
+    void clear();
+
     bool insert(Point rectBottomLeft, Point rectTopRight, Id id);
 
     void remove(uint32_t index);
 
     using IterateObjectsCallback =
-      std::function<void(const Id& id, Point bottomLeft, Point topRight)>;
+      std::function<bool(const Id& id, Point bottomLeft, Point topRight)>;
 
     void forEachObjectInArea(Point areaBottomLeft,
                              Point areaTopRight,
@@ -99,6 +101,8 @@ public:
     void traverseQuads(const TraverseQuadCallback& quadsObserver) const;
 
 private:
+    void initRoot();
+
     bool isValidRectangle(Point rectBottomLeft, Point rectTopRight) const;
 
     FreeList<QuadElement> m_elements;

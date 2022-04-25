@@ -74,12 +74,20 @@ TEST(QuadtreeTests, InsertOne)
     quadtree.forEachObjectInArea(areaBottomLeft,
                                  areaTopRight,
                                  [&](const Id& id, Point bottomLeft, Point topRight)
-                                 { ++counter; });
+                                 {
+                                     ++counter;
+                                     return true;
+                                 });
     EXPECT_EQ(counter, 1);
 
     counter = 0;
-    quadtree.forEachObjectInArea(
-      { 0.5, 0.5 }, { 2, 2 }, [&](const Id& id, Point bottomLeft, Point topRight) { ++counter; });
+    quadtree.forEachObjectInArea({ 0.5, 0.5 },
+                                 { 2, 2 },
+                                 [&](const Id& id, Point bottomLeft, Point topRight)
+                                 {
+                                     ++counter;
+                                     return true;
+                                 });
     EXPECT_EQ(counter, 0);
 }
 

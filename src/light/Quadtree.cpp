@@ -41,10 +41,7 @@ Quadtree::Quadtree(Point areaBottomLeft, Point areaTopRight, int maxElementsPerN
   , m_maxElementsPerNode{ maxElementsPerNode }
   , m_maxDepth{ maxDepth }
 {
-    QuadNode root;
-    root.count = 0;
-    root.firstChild = NIL;
-    m_quadNodes.push_back(root);
+    initRoot();
 }
 
 size_t Quadtree::size() const
@@ -67,6 +64,14 @@ void Quadtree::reserve(size_t capacity)
     //}
     // const auto estimatedQuadsCount = pow(SUBDIVISION_COUNT, estimatedDepth);
     // m_quadNodes.reserve(estimatedQuadsCount);
+}
+
+void Quadtree::clear()
+{
+    m_elements.clear();
+    m_elementNodes.clear();
+    m_quadNodes.clear();
+    initRoot();
 }
 
 bool Quadtree::insert(Point rectBottomLeft, Point rectTopRight, Id id)
@@ -167,6 +172,7 @@ bool Quadtree::insert(Point rectBottomLeft, Point rectTopRight, Id id)
                 {
                     // todo
                     // currentQuad.firstChild = m_freeNode;
+                    assert(false, "Not implemented");
                     return false;
                 }
             }
@@ -259,7 +265,10 @@ void Quadtree::forEachObjectInArea(Point rectBottomLeft,
                 if (isRectanglesOverlap(
                       rectBottomLeft, rectTopRight, element.bottomLeft, element.topRight))
                 {
-                    callback(element.id, element.bottomLeft, element.topRight);
+                    if (!callback(element.id, element.bottomLeft, element.topRight))
+                    {
+                        return;
+                    }
                 }
 
                 quadElementNode = currentQuadNode.next;
@@ -335,6 +344,14 @@ void Quadtree::traverseQuads(const TraverseQuadCallback& quadsObserver) const
             quads.push({ quad.firstChild + 3, bottomLeft + Point(newSize.x, 0), newSize });
         }
     }
+}
+
+void Quadtree::initRoot()
+{
+    QuadNode root;
+    root.count = 0;
+    root.firstChild = NIL;
+    m_quadNodes.push_back(root);
 }
 
 bool Quadtree::isValidRectangle(Point rectBottomLeft, Point rectTopRight) const

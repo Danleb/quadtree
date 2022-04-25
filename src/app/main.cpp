@@ -7,14 +7,16 @@ int main()
 {
     light::Point bottomLeft(0, 0);
     light::Point topRight(1, 1);
-    const auto circleRadius = 0.005;
-    const auto circlesCount = 300;
-    const auto speed = 0.3;
+    const auto circleRadius = 0.01;
+    const auto circlesCount = 100;
+    const auto speed = 0.05;
     light::CirclesSimulation simulation{ bottomLeft, topRight, circlesCount, circleRadius, speed };
 
     sf::RenderWindow window(sf::VideoMode(1000, 1000), "Quadtree visualization");
     window.setFramerateLimit(60);
     sf::Clock clock;
+
+    bool isSimulationRunning = true;
 
     while (window.isOpen())
     {
@@ -34,6 +36,14 @@ int main()
                       sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
                     break;
                 }
+                case sf::Event::KeyPressed:
+                {
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+                    {
+                        isSimulationRunning = !isSimulationRunning;
+                    }
+                    break;
+                }
                 default:
                     break;
             }
@@ -44,13 +54,20 @@ int main()
 
         const auto elapsedTime = clock.getElapsedTime().asSeconds();
         clock.restart();
-        // simulation.simulateStep(1 / 60.0);
-        // simulation.simulateStep(clock.getElapsedTime().asSeconds());
+
+        if (isSimulationRunning)
+        {
+            simulation.simulateStep(1 / 60.0);
+            // simulation.simulateStep(clock.getElapsedTime().asSeconds());
+        }
+
+        const float sideInPixels = std::min(windowSize.x, windowSize.y);
+        const light::Point workAreaSize{ sideInPixels, sideInPixels };
 
         // clang-format off
         glm::mat3 scale{
-            windowSize.x, 0, 0,
-            0, -static_cast<float>(windowSize.y), 0,
+            sideInPixels, 0, 0,
+            0, -sideInPixels, 0,
             0, 0, 1
         };
         glm::mat3 position{
@@ -70,7 +87,7 @@ int main()
               float speed)
           {
               const auto windowPoint = toScreenSpace * Point3(position.x, position.y, 1);
-              const auto circleRadiusPx = windowSize.x * radius;
+              const auto circleRadiusPx = workAreaSize.x * radius;
               sf::CircleShape circle(circleRadiusPx, circleRadiusPx);
               circle.setFillColor(sf::Color::Green);
               circle.setPosition(windowPoint.x - circleRadiusPx, windowPoint.y - circleRadiusPx);
@@ -88,19 +105,18 @@ int main()
         // Draw quads
         const int quadBorderThickness = 5;
         const auto halfThickness = quadBorderThickness / 2;
-        sf::RectangleShape horizontalLine(
-          { static_cast<float>(windowSize.x), quadBorderThickness });
+        sf::RectangleShape horizontalLine({ workAreaSize.x, quadBorderThickness });
         horizontalLine.setFillColor(sf::Color::Red);
-        sf::RectangleShape verticalLine({ quadBorderThickness, static_cast<float>(windowSize.y) });
+        sf::RectangleShape verticalLine({ quadBorderThickness, workAreaSize.y });
         verticalLine.setFillColor(sf::Color::Red);
 
         simulation.getQuadtree().traverseQuads(
           [&](light::Point bottomLeft, light::Point size)
           {
               horizontalLine.setSize(
-                sf::Vector2f{ size.x * windowSize.x, static_cast<float>(quadBorderThickness) });
+                sf::Vector2f{ size.x * workAreaSize.x, static_cast<float>(quadBorderThickness) });
               verticalLine.setSize(
-                sf::Vector2f{ static_cast<float>(quadBorderThickness), size.y * windowSize.y });
+                sf::Vector2f{ static_cast<float>(quadBorderThickness), size.y * workAreaSize.y });
 
               auto bottomLeft3d = Point3(bottomLeft, 1);
               const auto corner1 = toScreenSpace * bottomLeft3d;
