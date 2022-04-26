@@ -172,7 +172,8 @@ bool Quadtree::insert(Point rectBottomLeft, Point rectTopRight, Id id)
                 {
                     // todo
                     // currentQuad.firstChild = m_freeNode;
-                    assert(false, "Not implemented");
+                    // Not implemented
+                    assert(false);
                     return false;
                 }
             }
